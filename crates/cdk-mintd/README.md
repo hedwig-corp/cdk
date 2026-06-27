@@ -393,6 +393,7 @@ For complete configuration options, see the [example configuration file](./examp
 ## Documentation
 
 - **[Configuration Examples](./example.config.toml)** - Complete configuration reference
+- **[LDK Server Production Compose](../../misc/ldk-server-mint/README.md)** - Hardened host-Caddy deployment template
 - **[PostgreSQL Setup Guide](../../docker-compose.postgres.yaml)** - Database setup with Docker Compose
 - **[Development Guide](../../DEVELOPMENT.md)** - Contributing and development setup
 
