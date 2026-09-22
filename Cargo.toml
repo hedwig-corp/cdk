@@ -83,7 +83,7 @@ futures = { version = "0.3.28", default-features = false, features = ["async-awa
 gloo-timers = { version = "0.3", default-features = false, features = ["futures"] }
 lightning-invoice = { version = "0.34.0", features = ["serde", "std"] }
 lightning = { version = "0.2.0", default-features = false, features = ["std"]}
-ldk-server-client = { git = "https://github.com/lightningdevkit/ldk-server", rev = "50fe7523be3529d86bfee0dfc35df9a52aca7310", default-features = false }
+ldk-server-client = { git = "https://github.com/lightningdevkit/ldk-server", rev = "1f89528b89a02bd5277867b59b3a5a1e790d5dbd", default-features = false }
 ldk-node = "0.7.0"
 serde = { version = "1", features = ["derive", "rc"] }
 serde_bytes = "0.11"
