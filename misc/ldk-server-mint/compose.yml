@@ -1,0 +1,59 @@
+services:
+  mint:
+    image: ${CDK_MINTD_IMAGE:-hedwig/cdk-mintd-ldk-server:local}
+    build:
+      context: ../..
+      dockerfile: misc/ldk-server-mint/Dockerfile
+    restart: unless-stopped
+    init: true
+    network_mode: host
+    user: "${CDK_MINTD_UID:-10001}:${CDK_MINTD_GID:-10001}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      CDK_MINTD_URL: ${MINT_URL:-https://mint.hedwig.sh/}
+      CDK_MINTD_LISTEN_HOST: 127.0.0.1
+      CDK_MINTD_LISTEN_PORT: ${MINT_LISTEN_PORT:-3338}
+      CDK_MINTD_LDK_SERVER_ADDRESS: ${LDK_SERVER_ADDRESS:-127.0.0.1:3536}
+      CDK_MINTD_LDK_SERVER_CERT_PATH: /run/secrets/ldk_server_tls_crt
+      RUST_LOG: ${CDK_MINTD_RUST_LOG:-info}
+    secrets:
+      - cdk_mintd_seed
+      - ldk_server_api_key
+      - ldk_server_tls_crt
+    volumes:
+      - ./config/cdk-mintd.toml:/etc/cdk-mintd/config.toml:ro
+      - ./data/cdk-mintd:/var/lib/cdk-mintd:rw
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - |
+        export CDK_MINTD_LDK_SERVER_API_KEY="$$(head -n 1 /run/secrets/ldk_server_api_key)"
+        exec /usr/local/bin/cdk-mintd \
+          --work-dir /var/lib/cdk-mintd \
+          --config /etc/cdk-mintd/config.toml \
+          --seed-file /run/secrets/cdk_mintd_seed \
+          --enable-logging
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS "http://127.0.0.1:$${CDK_MINTD_LISTEN_PORT:-3338}/v1/info" >/dev/null
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    stop_grace_period: 30s
+
+secrets:
+  cdk_mintd_seed:
+    file: ./secrets/cdk-mintd.seed
+  ldk_server_api_key:
+    file: ./secrets/ldk-server-api-key
+  ldk_server_tls_crt:
+    file: ./secrets/ldk-server-tls.crt
