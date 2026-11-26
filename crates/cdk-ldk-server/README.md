@@ -4,9 +4,10 @@ Lightning backend for using a separate
 [LDK Server](https://github.com/lightningdevkit/ldk-server) daemon with
 `cdk-mintd`.
 
-`ldk-server` exposes a TLS gRPC API with HMAC authentication. This backend uses
-the upstream `ldk-server-client` crate and implements CDK's `MintPayment`
-interface for BOLT11 and BOLT12 mint/melt flows.
+`ldk-server` exposes a TLS gRPC API authenticated with macaroons. This backend
+uses `ldk-server-client` and implements CDK's `MintPayment` interface for
+BOLT11 and BOLT12 mint/melt flows. Pass a hex-encoded reusable v2 macaroon.
+The client binds a copy to each request. An HMAC API key is not accepted.
 
 ## Configuration
 
@@ -17,7 +18,7 @@ unit = "sat"
 
 [ldk_server]
 address = "127.0.0.1:3536"
-api_key = "<hex API key>"
+macaroon = "<hex v2 macaroon>"
 cert_path = "/path/to/ldk-server/tls.crt"
 fee_percent = 0.02
 reserve_fee_min = 2
@@ -29,7 +30,7 @@ reserve_fee_min = 2
 | --- | --- | --- |
 | `CDK_MINTD_LN_BACKEND` | Set to `ldk-server` | Yes |
 | `CDK_MINTD_LDK_SERVER_ADDRESS` | `ldk-server` host and port, without scheme | Yes |
-| `CDK_MINTD_LDK_SERVER_API_KEY` | HMAC API key as expected by `ldk-server-client` | Yes |
+| `CDK_MINTD_LDK_SERVER_MACAROON` | Hex-encoded reusable v2 macaroon | Yes |
 | `CDK_MINTD_LDK_SERVER_CERT_PATH` | Path to the pinned TLS certificate PEM | Yes |
 | `CDK_MINTD_LDK_SERVER_FEE_PERCENT` | Fee reserve percentage, default `0.02` | No |
 | `CDK_MINTD_LDK_SERVER_RESERVE_FEE_MIN` | Minimum fee reserve in sats, default `2` | No |
